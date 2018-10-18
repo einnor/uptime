@@ -18,6 +18,9 @@ var server = http.createServer(function(req, res) {
 	// Get the HTTP method
 	var method = req.method.toLowerCase();
 
+	// Get the headers an an object
+	var headers = req.headers;
+
 	// Send a response
 	res.end('Hey\n');
 });
