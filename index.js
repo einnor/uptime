@@ -1,5 +1,6 @@
 var http  = require('http');
 var url = require('url');
+var StringDecoder = require('string_decoder').StringDecoder
 
 var server = http.createServer(function(req, res) {
 
@@ -21,8 +22,18 @@ var server = http.createServer(function(req, res) {
 	// Get the headers an an object
 	var headers = req.headers;
 
-	// Send a response
-	res.end('Hey\n');
+	// Get the payload, if any
+	var decoder = new StringDecoder('utf-8');
+	var buffer = '';
+	req.on('data', function(data) {
+		buffer += decoder.write(data);
+	});
+	req.on('end', function() {
+		buffer += decoder.end();
+
+		// Send a response
+		res.end('Hey\n');
+	});
 });
 
 server.listen(4000, function() {
