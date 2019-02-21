@@ -39,3 +39,6 @@ var server = http.createServer(function(req, res) {
 server.listen(4000, function() {
 	console.log('The server is listening on port 4000');
 });
+
+// Define a request router
+var router = {};
