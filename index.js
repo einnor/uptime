@@ -4,7 +4,15 @@ var StringDecoder = require('string_decoder').StringDecoder
 var config = require('./config');
 
 var server = http.createServer((req, res) => {
+	unifiedServer(req, res);
+});
 
+server.listen(config.port, () => {
+	console.log(`The server is listening on port ${config.port} on ${config.envName} mode`);
+});
+
+//All ther server logic for both https and https server
+var unifiedServer = (req, res) => {
 	// Get the URL and parse it
 	var parsedUrl = url.parse(req.url, true);
 
@@ -61,11 +69,7 @@ var server = http.createServer((req, res) => {
 			console.log(statusCode, payloadString);
 		});		
 	});
-});
-
-server.listen(config.port, () => {
-	console.log(`The server is listening on port ${config.port} on ${config.envName} mode`);
-});
+};
 
 // Define the handlers
 var handlers = {};
