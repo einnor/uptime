@@ -2,7 +2,7 @@ var http  = require('http');
 var url = require('url');
 var StringDecoder = require('string_decoder').StringDecoder
 
-var server = http.createServer(function(req, res) {
+var server = http.createServer((req, res) => {
 
 	// Get the URL and parse it
 	var parsedUrl = url.parse(req.url, true);
@@ -25,10 +25,10 @@ var server = http.createServer(function(req, res) {
 	// Get the payload, if any
 	var decoder = new StringDecoder('utf-8');
 	var buffer = '';
-	req.on('data', function(data) {
+	req.on('data', (data) => {
 		buffer += decoder.write(data);
 	});
-	req.on('end', function() {
+	req.on('end', () => {
 		buffer += decoder.end();
 
 		// Send a response
@@ -36,9 +36,25 @@ var server = http.createServer(function(req, res) {
 	});
 });
 
-server.listen(4000, function() {
+server.listen(4000, () => {
 	console.log('The server is listening on port 4000');
 });
 
+// Deffine the handlers
+var handlers = {};
+
+// Sample handler
+handlers.sample = (data, callback) => {
+	// Callback a http status code and a payload object
+	callback(406, { name: 'sample handler' });
+};
+
+// Not found handler
+handlers.notFound = (data, callback) => {
+	callback(404);
+};
+
 // Define a request router
-var router = {};
+var router = {
+	'sample': handlers.sample,
+};
