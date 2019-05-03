@@ -4,14 +4,14 @@ var environments = {};
 // Staging (default) environment
 environments.staging = {
   httpPort: 4000,
-  httpsPorts: 4001,
+  httpsPort: 4001,
   envName: 'staging',
 };
 
 // Production environment
 environments.production = {
-  httpPorts: 5000,
-  httpsPorts: 5001,
+  httpPort: 5000,
+  httpsPort: 5001,
   envName: 'production',
 };
 

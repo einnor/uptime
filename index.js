@@ -1,14 +1,33 @@
 var http  = require('http');
+var https  = require('https');
 var url = require('url');
+var fs = require('fs');
 var StringDecoder = require('string_decoder').StringDecoder
 var config = require('./config');
 
-var server = http.createServer((req, res) => {
+
+// Instantiate the http server
+var httpServer = http.createServer((req, res) => {
 	unifiedServer(req, res);
 });
 
-server.listen(config.port, () => {
-	console.log(`The server is listening on port ${config.port} on ${config.envName} mode`);
+// Start the http server
+httpServer.listen(config.httpPort, () => {
+	console.log(`The server is listening on port ${config.httpPort} on ${config.envName} mode`);
+});
+
+// Instantiate the https server
+var httpsServerOptions = {
+	key: fs.readFileSync('./https/key.pem'),
+	cert: fs.readFileSync('./https/cert.pem'),
+};
+var httpsServer = https.createServer(httpsServerOptions, (req, res) => {
+	unifiedServer(req, res);
+});
+
+// Start the https server
+httpsServer.listen(config.httpsPort, () => {
+	console.log(`The server is listening on port ${config.httpsPort} on ${config.envName} mode`);
 });
 
 //All ther server logic for both https and https server
