@@ -14,7 +14,7 @@ var server = http.createServer((req, res) => {
 	var trimmedPath = path.replace(/^\/+|\/+$/g, '');
 
 	// Get the query string an an object
-	var queryString = parsedUrl.query;
+	var queryStringObject = parsedUrl.query;
 
 	// Get the HTTP method
 	var method = req.method.toLowerCase();
@@ -31,8 +31,33 @@ var server = http.createServer((req, res) => {
 	req.on('end', () => {
 		buffer += decoder.end();
 
-		// Send a response
-		res.end('Hey\n');
+		// Choose the handler this request should go to. If one is not found, use the notFound handler
+		var chosenHandler = typeof(router[trimmedPath]) !== 'undefined' ? router[trimmedPath] : handlers.notFound;
+
+		// Construct the data object to send to the handler
+		var data = {
+			trimmedPath,
+			queryStringObject,
+			method,
+			headers,
+			payload: buffer,
+		};
+
+		// Route the request to the handler specified in the router
+		chosenHandler(data, (statusCode, payload) => {
+			// Use the status code called back by the handler, or default to 200
+			// Use the payload called back by the handler, or default to an empty object
+			statusCode = typeof(statusCode) === 'number' ? statusCode : 200;
+			payload = typeof(payload) === 'object' ? payload : {};
+
+			// Convert the payload to a string
+			var payloadString = JSON.stringify(payload);
+
+			// Return the response
+			res.writeHead(statusCode);
+			res.end(payloadString);
+			console.log(statusCode, payloadString);
+		});		
 	});
 });
 
@@ -40,7 +65,7 @@ server.listen(4000, () => {
 	console.log('The server is listening on port 4000');
 });
 
-// Deffine the handlers
+// Define the handlers
 var handlers = {};
 
 // Sample handler
