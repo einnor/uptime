@@ -4,6 +4,7 @@ var url = require('url');
 var fs = require('fs');
 var StringDecoder = require('string_decoder').StringDecoder
 var config = require('./config');
+var _data = require('./lib/data');
 
 
 // Instantiate the http server
