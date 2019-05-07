@@ -1,3 +1,3 @@
 # Uptime
 
-A Node.js uptime monitoring applicationwq
+A Node.js uptime monitoring application
