@@ -37,6 +37,7 @@ test('real HTTP user/session/check lifecycle and rejection cases', async () => {
   };
   try {
     assert.equal((await request('/ping')).status, 200);
+    assert.equal((await request('/__proto__')).status, 404);
     assert.equal((await request('/api/users', 'POST', { tosAgreement: true })).status, 400);
     const user = { firstName: 'Demo', lastName: 'User', phone: '2025550100', password: 'local-example-only', tosAgreement: true };
     assert.equal((await request('/api/users', 'POST', user)).status, 200);
@@ -68,6 +69,18 @@ test('real HTTP user/session/check lifecycle and rejection cases', async () => {
 test('worker honors custom ports and reports a timeout once', async () => {
   const probe = http.createServer((request, response) => {
     if (request.url === '/ok') response.end('healthy');
+  });
+
+  test('malformed check URLs are recorded as failures instead of crashing the worker', () => {
+    const original = workers.processCheckOutcome;
+    let outcome;
+    workers.processCheckOutcome = (_, result) => { outcome = result; };
+    try {
+      workers.performCheck({ protocol: 'http', url: '[]', method: 'get', timeoutSeconds: 1 });
+      assert.equal(outcome.error.value, 'Invalid check URL');
+    } finally {
+      workers.processCheckOutcome = original;
+    }
   });
   await new Promise(resolve => probe.listen(0, '127.0.0.1', resolve));
   const original = workers.processCheckOutcome;
