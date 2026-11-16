@@ -14,7 +14,7 @@ app.init = () => {
 };
 
 // Execute
-app.init();
+if (require.main === module) app.init();
 
 // Export the app
 module.exports = app;
