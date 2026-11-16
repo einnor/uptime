@@ -71,17 +71,6 @@ test('worker honors custom ports and reports a timeout once', async () => {
     if (request.url === '/ok') response.end('healthy');
   });
 
-  test('malformed check URLs are recorded as failures instead of crashing the worker', () => {
-    const original = workers.processCheckOutcome;
-    let outcome;
-    workers.processCheckOutcome = (_, result) => { outcome = result; };
-    try {
-      workers.performCheck({ protocol: 'http', url: '[]', method: 'get', timeoutSeconds: 1 });
-      assert.equal(outcome.error.value, 'Invalid check URL');
-    } finally {
-      workers.processCheckOutcome = original;
-    }
-  });
   await new Promise(resolve => probe.listen(0, '127.0.0.1', resolve));
   const original = workers.processCheckOutcome;
   const outcomes = [];
@@ -101,5 +90,17 @@ test('worker honors custom ports and reports a timeout once', async () => {
     workers.processCheckOutcome = original;
     probe.closeAllConnections();
     await new Promise(resolve => probe.close(resolve));
+  }
+});
+
+test('malformed check URLs are recorded as failures instead of crashing the worker', () => {
+  const original = workers.processCheckOutcome;
+  let outcome;
+  workers.processCheckOutcome = (_, result) => { outcome = result; };
+  try {
+    workers.performCheck({ protocol: 'http', url: '[]', method: 'get', timeoutSeconds: 1 });
+    assert.equal(outcome.error.value, 'Invalid check URL');
+  } finally {
+    workers.processCheckOutcome = original;
   }
 });
